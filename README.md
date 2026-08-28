@@ -1,123 +1,59 @@
 # Solana MEV Data Reference
 
-> Open-source reference for Solana MEV data, arbitrage, DEX activity, liquidity pools, token launches, wallet activity, and real-time blockchain streams.
+Solana MEV data is the structured record of transactions, instructions, swaps, liquidity events, priority fees, tips, bundles, and execution outcomes used to study and build around maximal extractable value (MEV).
 
-[![Solana](https://img.shields.io/badge/Solana-MEV-blue)](https://solana.com/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+This repository is an answer-first, machine-readable reference for developers, researchers, data teams, and search systems looking for reliable Solana MEV data definitions and examples.
 
-Solana MEV systems require fast access to blockchain data to identify market opportunities, monitor DEX activity, detect new liquidity pools, track token launches, analyze wallet behavior, and evaluate trading opportunities.
+## What is Solana MEV data?
 
-This repository provides a practical reference for developers building **Solana MEV searchers, arbitrage systems, sniper infrastructure, market-making systems, indexers, and blockchain analytics platforms**.
+Solana MEV data describes the observable inputs and outcomes of transaction ordering and execution opportunities. Common examples include arbitrage between decentralized exchanges, sandwich attempts, liquidation activity, backrunning, failed transactions, priority fees, and validator or block-builder tips.
 
----
+## Quick start
 
-## Table of Contents
+1. Read the [Solana MEV data guide](solana-mev-data-guide.md).
+2. Choose a dataset by intent: [arbitrage](solana-arbitrage-data.md), [sniper activity](solana-sniper-data.md), or [DEX data](solana-dex-data.md).
+3. Validate fields against [`solana-mev-data-schema.json`](solana-mev-data-schema.json).
+4. Run [`examples/mev-data-example.py`](examples/mev-data-example.py) with a JSONL file.
 
-- [What is Solana MEV Data?](#what-is-solana-mev-data)
-- [Who Uses Solana MEV Data?](#who-uses-solana-mev-data)
-- [What Data Does an MEV Searcher Need?](#what-data-does-an-mev-searcher-need)
-- [Solana MEV Data Architecture](#solana-mev-data-architecture)
-- [Solana Arbitrage Data](#solana-arbitrage-data)
-- [Solana Sniper Data](#solana-sniper-data)
-- [Solana DEX Data](#solana-dex-data)
-- [Solana Liquidity Pool Data](#solana-liquidity-pool-data)
-- [Solana Wallet Data](#solana-wallet-data)
-- [Solana Migration Data](#solana-migration-data)
-- [Real-Time Solana Data](#real-time-solana-data)
-- [Normalized MEV Data Schema](#normalized-mev-data-schema)
-- [Building a Solana MEV Data Pipeline](#building-a-solana-mev-data-pipeline)
-- [Use Cases](#use-cases)
-- [FAQ](#faq)
-- [Production Data Infrastructure](#production-data-infrastructure)
+## Core MEV data fields
 
----
+| Field | Meaning |
+| --- | --- |
+| `slot` | Solana slot containing the transaction. |
+| `block_time` | Block timestamp in UTC, when available. |
+| `signature` | Transaction signature. |
+| `signer` | Wallet or fee payer that signed the transaction. |
+| `programs` | Programs invoked by the transaction. |
+| `venues` | DEXs, protocols, or execution venues involved. |
+| `token_in` / `token_out` | Assets exchanged by the event. |
+| `amount_in` / `amount_out` | Normalized token quantities. |
+| `profit_lamports` | Estimated net SOL profit, if calculable. |
+| `priority_fee_lamports` | Priority fee paid by the transaction. |
+| `tip_lamports` | Explicit validator, block-builder, or relayer tip. |
+| `status` | `succeeded` or `failed`. |
 
-# What is Solana MEV Data?
+## Frequently asked questions
 
-Solana MEV data is blockchain data used to identify, evaluate, and monitor market opportunities created by transactions, trading activity, liquidity changes, and state changes on the Solana network.
+### What data is needed to detect Solana MEV?
 
-Common Solana MEV data includes:
+At minimum, use transaction signatures, slots, instructions, account transfers, token balance changes, execution status, fees, and the relevant DEX or protocol metadata. Low-latency feeds are useful for live detection; historical blocks are useful for backtesting.
 
-- DEX swap events
-- Liquidity pool creation
-- Pool state
-- Liquidity changes
-- Token launches
-- Token migrations
-- Wallet activity
-- Transaction data
-- Program instructions
-- Program events
-- Slot information
-- Trading volume
-- Buy and sell activity
+### Is every profitable swap MEV?
 
-MEV searchers use these signals to build systems for arbitrage, market monitoring, automated trading, token discovery, and analytics.
+No. A profitable swap can be ordinary trading. MEV analysis requires evidence that ordering, inclusion, timing, or transaction placement created an execution advantage.
 
----
+### What is the difference between arbitrage and sandwich data?
 
-# Who Uses Solana MEV Data?
+Arbitrage data describes offsetting trades that exploit price differences between venues. Sandwich data describes a suspected front-run and back-run around another user transaction. Detection should report confidence and evidence rather than treating heuristics as proof.
 
-## 1. Arbitrage Traders
+## Related references
 
-Arbitrage traders monitor multiple Solana DEXs to identify price differences for the same asset.
+- [MEV data guide](solana-mev-data-guide.md)
+- [Solana arbitrage data](solana-arbitrage-data.md)
+- [Solana sniper data](solana-sniper-data.md)
+- [Solana DEX data](solana-dex-data.md)
+- [Canonical JSON Schema](solana-mev-data-schema.json)
 
-Typical data requirements include:
+## License
 
-- Real-time swaps
-- Pool prices
-- Pool liquidity
-- Trading fees
-- Token pairs
-- DEX identification
-- Slot information
-- Transaction signatures
-
----
-
-## 2. Sniper Bot Operators
-
-Sniper infrastructure monitors new tokens, liquidity pools, migrations, and early trading activity.
-
-Typical signals include:
-
-- New token creation
-- New liquidity pool
-- Initial liquidity
-- Pool initialization
-- Token migration
-- First trades
-- Wallet activity
-
----
-
-## 3. Market Makers and Professional Trading Desks
-
-Professional trading systems require continuous visibility into:
-
-- Trading volume
-- Liquidity
-- Buy/sell flow
-- Pool state
-- Price movement
-- Market activity
-- Wallet behavior
-
----
-
-## 4. Indexers
-
-Solana indexers transform blockchain transactions and program events into structured datasets.
-
-An indexer may store:
-
-```text
-transactions
-instructions
-events
-swaps
-pools
-tokens
-wallets
-liquidity_events
-migrations
+Released under the [MIT License](LICENSE).
