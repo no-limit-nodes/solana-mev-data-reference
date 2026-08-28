@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Rish0x29/solana-mev-data-reference/blob/main/solana-mev-data-schema.json",
+  "title": "Solana MEV Data Event",
+  "description": "A normalized, auditable record for Solana MEV and related market events.",
+  "type": "object",
+  "required": ["event_id", "event_type", "slot", "signature", "status"],
+  "properties": {
+    "event_id": {"type": "string", "description": "Stable identifier for the strategy or detected event."},
+    "event_type": {"type": "string", "enum": ["arbitrage", "sandwich_candidate", "backrun_candidate", "sniper_candidate", "liquidation", "dex_trade", "unknown"]},
+    "slot": {"type": "integer", "minimum": 0},
+    "block_time": {"type": ["string", "null"], "format": "date-time"},
+    "signature": {"type": "string", "minLength": 32},
+    "related_signatures": {"type": "array", "items": {"type": "string"}},
+    "signer": {"type": ["string", "null"]},
+    "programs": {"type": "array", "items": {"type": "string"}},
+    "venues": {"type": "array", "items": {"type": "string"}},
+    "token_in": {"type": ["string", "null"]},
+    "token_out": {"type": ["string", "null"]},
+    "amount_in": {"type": ["number", "null"], "minimum": 0},
+    "amount_out": {"type": ["number", "null"], "minimum": 0},
+    "profit_lamports": {"type": ["integer", "null"]},
+    "priority_fee_lamports": {"type": ["integer", "null"], "minimum": 0},
+    "tip_lamports": {"type": ["integer", "null"], "minimum": 0},
+    "status": {"type": "string", "enum": ["succeeded", "failed", "unknown"]},
+    "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "detection_method": {"type": ["string", "null"]},
+    "source": {"type": ["string", "null"]},
+    "attributes": {"type": "object", "additionalProperties": true}
+  },
+  "additionalProperties": false
+}
